@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.journeyDistance = void 0;
+exports.journeysBetweenTowns = exports.journeyDistance = void 0;
 class Route {
     constructor(start, end, distance) {
         this.start = start;
@@ -19,6 +19,7 @@ const routes = [
     new Route('E', 'B', 3),
     new Route('A', 'E', 7),
 ];
+// Provide journey string, receive distance
 // @param journey - eg: 'A-B-C'
 function journeyDistance(journey) {
     let journeyRoutes = [];
@@ -48,6 +49,69 @@ function journeyDistance(journey) {
     return journeyDistance;
 }
 exports.journeyDistance = journeyDistance;
-// Number of routes between two towns/nodes
+class Journey {
+    constructor(routes = []) {
+        this.routes = routes;
+    }
+    lastRoute() {
+        return this.routes[this.routes.length - 1];
+    }
+    routesAsString() {
+        let routeString = '';
+        this.routes.forEach((r, i) => {
+            const last = i === this.routes.length - 1;
+            if (last) {
+                routeString += r.start + '-' + r.end;
+            }
+            else {
+                routeString += r.start + '-';
+            }
+        });
+        return routeString;
+    }
+}
+// Number of routes between two towns/nodes (+ with exact number of stops/towns)
+function journeysBetweenTowns(start, end) {
+    // Find routes with start
+    // Find routes with end
+    // routes
+    // Starting routes, map to Journeys
+    // Queue of journeys (paths)
+    return 0;
+}
+exports.journeysBetweenTowns = journeysBetweenTowns;
+function getJourneysByStops(start, stops) {
+    let journeys = getRoutesByStart(start)
+        .map(x => new Journey([x]));
+    while (stops > 1) {
+        console.log(stops);
+        console.log('journeys', journeys);
+        let q = [];
+        journeys.forEach(j => {
+            q.push(...getNextJourneyOptions(j));
+        });
+        console.log('q', q);
+        journeys = q;
+        stops--;
+    }
+    console.log('final journeys', journeys);
+    journeys.forEach(j => console.log(j.routesAsString()));
+}
+function getRoutesByStart(start) {
+    return routes.filter(x => x.start === start);
+}
+// Return Journeys with all possible next Routes added
+function getNextJourneyOptions(j) {
+    let ops = [];
+    let lastRoute = j.lastRoute();
+    if (lastRoute) { // Handle possible undefined
+        let nextRoutes = getRoutesByStart(lastRoute.end);
+        // console.log(nextRoutes);
+        nextRoutes.forEach(nr => {
+            ops.push(new Journey([...j.routes, nr]));
+        });
+    }
+    return ops;
+}
+getJourneysByStops('C', 3);
 // Shortest route between two towns/nodes
-journeyDistance('A-B-C');
