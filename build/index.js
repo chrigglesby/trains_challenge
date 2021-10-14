@@ -34,7 +34,6 @@ function journeyDistance(journey) {
                 const route = routes.find(r => {
                     return r.start === start && r.end === end;
                 });
-                console.log(route);
                 if (!route)
                     throw new Error('NO SUCH ROUTE');
                 journeyRoutes.push(route);
@@ -49,14 +48,17 @@ function journeyDistance(journey) {
     return journeyDistance;
 }
 exports.journeyDistance = journeyDistance;
+// A Journey represents multiple Routes strung together
 class Journey {
     constructor(routes = []) {
         this.routes = routes;
     }
     lastRoute() {
+        if (this.routes.length === 0)
+            throw new Error('Journey has no Routes');
         return this.routes[this.routes.length - 1];
     }
-    routesAsString() {
+    toString() {
         let routeString = '';
         this.routes.forEach((r, i) => {
             const last = i === this.routes.length - 1;
@@ -70,32 +72,32 @@ class Journey {
         return routeString;
     }
 }
-// Number of routes between two towns/nodes (+ with exact number of stops/towns)
-function journeysBetweenTowns(start, end) {
-    // Find routes with start
-    // Find routes with end
-    // routes
-    // Starting routes, map to Journeys
-    // Queue of journeys (paths)
-    return 0;
+// Return number of possible Journeys between two towns, limited by stops
+function journeysBetweenTowns(start, end, stops) {
+    let journeys = getJourneys(start, stops, end);
+    return journeys.filter(j => end === j.lastRoute().end).length;
 }
 exports.journeysBetweenTowns = journeysBetweenTowns;
-function getJourneysByStops(start, stops) {
+// Return all possible Journeys from start to a maximum number of stops, optionally capped by end
+function getJourneys(start, stops, end) {
     let journeys = getRoutesByStart(start)
         .map(x => new Journey([x]));
     while (stops > 1) {
-        console.log(stops);
-        console.log('journeys', journeys);
         let q = [];
         journeys.forEach(j => {
-            q.push(...getNextJourneyOptions(j));
+            if (end && j.lastRoute().end === end) {
+                // End found so push it back as is (exploration over)
+                q.push(j);
+            }
+            else {
+                q.push(...getNextJourneyOptions(j));
+            }
         });
-        console.log('q', q);
         journeys = q;
         stops--;
     }
-    console.log('final journeys', journeys);
-    journeys.forEach(j => console.log(j.routesAsString()));
+    // journeys.forEach(j => console.log(j.toString()));
+    return journeys;
 }
 function getRoutesByStart(start) {
     return routes.filter(x => x.start === start);
@@ -103,15 +105,9 @@ function getRoutesByStart(start) {
 // Return Journeys with all possible next Routes added
 function getNextJourneyOptions(j) {
     let ops = [];
-    let lastRoute = j.lastRoute();
-    if (lastRoute) { // Handle possible undefined
-        let nextRoutes = getRoutesByStart(lastRoute.end);
-        // console.log(nextRoutes);
-        nextRoutes.forEach(nr => {
-            ops.push(new Journey([...j.routes, nr]));
-        });
-    }
+    let nextRoutes = getRoutesByStart(j.lastRoute().end);
+    nextRoutes.forEach(nr => {
+        ops.push(new Journey([...j.routes, nr]));
+    });
     return ops;
 }
-getJourneysByStops('C', 3);
-// Shortest route between two towns/nodes
