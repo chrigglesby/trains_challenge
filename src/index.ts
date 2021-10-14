@@ -24,7 +24,7 @@ const routes = [
 
 // Provide journey string, receive distance
 // @param journey - eg: 'A-B-C'
-export function journeyDistance(journey: string): number|string|Error {
+export function getJourneyDistance(journey: string): number|string|Error {
     let journeyRoutes: Array<Route> = [];
     const towns = journey.split('-');
 
@@ -49,9 +49,9 @@ export function journeyDistance(journey: string): number|string|Error {
         return e.message;
     }
 
-    let journeyDistance = 0;
-    journeyRoutes.forEach(r => journeyDistance += r.distance);
-    return journeyDistance;
+    let getJourneyDistance = 0;
+    journeyRoutes.forEach(r => getJourneyDistance += r.distance);
+    return getJourneyDistance;
 }
 
 // A Journey represents multiple Routes strung together

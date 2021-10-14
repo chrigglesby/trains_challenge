@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.journeysBetweenTowns = exports.journeyDistance = void 0;
+exports.getJourneysBetween = exports.getJourneyDistance = void 0;
 class Route {
     constructor(start, end, distance) {
         this.start = start;
@@ -21,7 +21,7 @@ const routes = [
 ];
 // Provide journey string, receive distance
 // @param journey - eg: 'A-B-C'
-function journeyDistance(journey) {
+function getJourneyDistance(journey) {
     let journeyRoutes = [];
     const towns = journey.split('-');
     if (towns.length === 1)
@@ -43,11 +43,11 @@ function journeyDistance(journey) {
     catch (e) {
         return e.message;
     }
-    let journeyDistance = 0;
-    journeyRoutes.forEach(r => journeyDistance += r.distance);
-    return journeyDistance;
+    let getJourneyDistance = 0;
+    journeyRoutes.forEach(r => getJourneyDistance += r.distance);
+    return getJourneyDistance;
 }
-exports.journeyDistance = journeyDistance;
+exports.getJourneyDistance = getJourneyDistance;
 // A Journey represents multiple Routes strung together
 class Journey {
     constructor(routes = []) {
@@ -72,15 +72,25 @@ class Journey {
         return routeString;
     }
 }
-// Return number of possible Journeys between two towns, limited by stops
-function journeysBetweenTowns(start, end, stops) {
+// Return number of possible Journeys between two towns
+//
+// @param start - Starting town/node
+// @param end - Final destination town/node
+// @param stops - Maximum amount of stops allowed to reach end
+function getJourneysBetween(start, end, stops) {
     let journeys = getJourneys(start, stops, end);
     return journeys.filter(j => end === j.lastRoute().end).length;
 }
-exports.journeysBetweenTowns = journeysBetweenTowns;
-// Return all possible Journeys from start to a maximum number of stops, optionally capped by end
+exports.getJourneysBetween = getJourneysBetween;
+// Return all possible Journeys from a start point
+// (In effect this is a Breadth First Search algorithm)
+//
+// @param start - Node to begin search from
+// @param stops - Depth/Iterations to which we limit the search
+//                (necessary as the data is a Cyclic Directed Graph and could search infinitely)
+// @param end (optional) - Optionally cap the search once a specified node is reached
 function getJourneys(start, stops, end) {
-    let journeys = getRoutesByStart(start)
+    let journeys = getRoutes(start)
         .map(x => new Journey([x]));
     while (stops > 1) {
         let q = [];
@@ -100,16 +110,20 @@ function getJourneys(start, stops, end) {
     journeys.forEach(j => console.log(j.toString()));
     return journeys;
 }
-function getRoutesByStart(start) {
+// Get Routes by start node
+//
+// @param start - Start node
+function getRoutes(start) {
     return routes.filter(x => x.start === start);
 }
 // Return Journeys with all possible next Routes added
+//
+// @param j - The Journey to find next Routes of
 function getNextJourneyOptions(j) {
     let ops = [];
-    let nextRoutes = getRoutesByStart(j.lastRoute().end);
+    let nextRoutes = getRoutes(j.lastRoute().end);
     nextRoutes.forEach(nr => {
         ops.push(new Journey([...j.routes, nr]));
     });
     return ops;
 }
-// journeysBetweenTowns('A', 'C', 4);
