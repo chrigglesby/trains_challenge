@@ -89,8 +89,16 @@ class Journey {
 // @param start - Starting town/node
 // @param end - Final destination town/node
 // @param stops - Maximum amount of stops allowed to reach end
-export function getJourneysBetween(start: string, end: string, stops: number): number {
-    let journeys = getJourneys(start, stops, end);
+// @param exactStops(optional) - Optionally request only results with the exact number of stops
+//                               (overrides default 'stops' functionality)
+export function getJourneysBetween(start: string, end: string, stops: number, exactStops: Boolean = false): number {
+    let journeys: Array<Journey>;
+
+    if (exactStops) {
+        journeys = getJourneys(start, stops);
+    } else {
+        journeys = getJourneys(start, stops, end);
+    }
 
     return journeys.filter(j => end === j.lastRoute().end).length;
 }
@@ -124,7 +132,7 @@ function getJourneys(start: string, stops: number, end?: string): Array<Journey>
         stops--;
     }
 
-    journeys.forEach(j => console.log(j.toString()));
+    // journeys.forEach(j => console.log(j.toString()));
 
     return journeys;
 }

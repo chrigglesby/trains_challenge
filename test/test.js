@@ -54,19 +54,19 @@ describe('getJourneysBetween', function() {
 
     describe('C to C, 3 stops exact', function() {
         it('expects 1', function() {
-            assert.equal(App.getJourneysBetween('C', 'C', 3), 1);
+            assert.equal(App.getJourneysBetween('C', 'C', 3, true), 1);
         });
     });
 
     describe('A to C, 4 stops exact', function() {
         it('expects 3', function() {
-            assert.equal(App.getJourneysBetween('A', 'C', 4), 3);
+            assert.equal(App.getJourneysBetween('A', 'C', 4, true), 3);
         });
     });
 
     describe('C to D, 7 stops exact', function() {
         it('expects 4', function() {
-            assert.equal(App.getJourneysBetween('C', 'D', 7), 4);
+            assert.equal(App.getJourneysBetween('C', 'D', 7, true), 4);
         });
     });
 });

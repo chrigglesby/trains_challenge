@@ -77,8 +77,16 @@ class Journey {
 // @param start - Starting town/node
 // @param end - Final destination town/node
 // @param stops - Maximum amount of stops allowed to reach end
-function getJourneysBetween(start, end, stops) {
-    let journeys = getJourneys(start, stops, end);
+// @param exactStops(optional) - Optionally request only results with the exact number of stops
+//                               (overrides default 'stops' functionality)
+function getJourneysBetween(start, end, stops, exactStops = false) {
+    let journeys;
+    if (exactStops) {
+        journeys = getJourneys(start, stops);
+    }
+    else {
+        journeys = getJourneys(start, stops, end);
+    }
     return journeys.filter(j => end === j.lastRoute().end).length;
 }
 exports.getJourneysBetween = getJourneysBetween;
