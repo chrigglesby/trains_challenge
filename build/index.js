@@ -85,6 +85,7 @@ function getJourneys(start, stops, end) {
     while (stops > 1) {
         let q = [];
         journeys.forEach(j => {
+            // TODO: Modify to allow NOT ending at end, but continue until stops
             if (end && j.lastRoute().end === end) {
                 // End found so push it back as is (exploration over)
                 q.push(j);
@@ -96,7 +97,7 @@ function getJourneys(start, stops, end) {
         journeys = q;
         stops--;
     }
-    // journeys.forEach(j => console.log(j.toString()));
+    journeys.forEach(j => console.log(j.toString()));
     return journeys;
 }
 function getRoutesByStart(start) {
@@ -111,3 +112,4 @@ function getNextJourneyOptions(j) {
     });
     return ops;
 }
+// journeysBetweenTowns('A', 'C', 4);

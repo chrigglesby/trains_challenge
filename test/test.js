@@ -33,22 +33,40 @@ describe('journeyDistance', function() {
     });
 });
 
-describe('journeysBetweenTowns', function() {
+describe('getJourneysBetween', function() {
     describe('C to C, 3 stops max', function() {
         it('expects 2', function() {
-            assert.equal(App.journeysBetweenTowns('C', 'C', 3), 2);
+            assert.equal(App.getJourneysBetween('C', 'C', 3), 2);
         });
     });
 
     describe('A to C, 4 stops max', function() {
         it('expects 4', function() {
-            assert.equal(App.journeysBetweenTowns('A', 'C', 4), 4);
+            assert.equal(App.getJourneysBetween('A', 'C', 4), 4);
         });
     });
 
     describe('C to D, 7 stops max', function() {
         it('expects 3', function() {
-            assert.equal(App.journeysBetweenTowns('C', 'D', 7), 3);
+            assert.equal(App.getJourneysBetween('C', 'D', 7), 3);
+        });
+    });
+
+    describe('C to C, 3 stops exact', function() {
+        it('expects 1', function() {
+            assert.equal(App.getJourneysBetween('C', 'C', 3), 1);
+        });
+    });
+
+    describe('A to C, 4 stops exact', function() {
+        it('expects 3', function() {
+            assert.equal(App.getJourneysBetween('A', 'C', 4), 3);
+        });
+    });
+
+    describe('C to D, 7 stops exact', function() {
+        it('expects 4', function() {
+            assert.equal(App.getJourneysBetween('C', 'D', 7), 4);
         });
     });
 });
