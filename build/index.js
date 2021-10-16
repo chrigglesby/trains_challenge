@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getJourneysBetween = exports.getJourneyDistance = void 0;
+exports.getShortestJourneyDistance = exports.getJourneysBetween = exports.getJourneyDistance = void 0;
+// A Route represents the link between two stations/towns
+// - It is also an 'edge' in terms of a directed graph data structure
 class Route {
     constructor(start, end, distance) {
         this.start = start;
@@ -8,46 +10,6 @@ class Route {
         this.distance = distance;
     }
 }
-const routes = [
-    new Route('A', 'B', 5),
-    new Route('B', 'C', 4),
-    new Route('C', 'D', 8),
-    new Route('D', 'C', 8),
-    new Route('D', 'E', 6),
-    new Route('A', 'D', 5),
-    new Route('C', 'E', 2),
-    new Route('E', 'B', 3),
-    new Route('A', 'E', 7),
-];
-// Provide journey string, receive distance
-// @param journey - eg: 'A-B-C'
-function getJourneyDistance(journey) {
-    let journeyRoutes = [];
-    const towns = journey.split('-');
-    if (towns.length === 1)
-        return 0;
-    try {
-        towns.forEach((town, i) => {
-            if (i < towns.length - 1) {
-                const start = town;
-                const end = towns[i + 1];
-                const route = routes.find(r => {
-                    return r.start === start && r.end === end;
-                });
-                if (!route)
-                    throw new Error('NO SUCH ROUTE');
-                journeyRoutes.push(route);
-            }
-        });
-    }
-    catch (e) {
-        return e.message;
-    }
-    let getJourneyDistance = 0;
-    journeyRoutes.forEach(r => getJourneyDistance += r.distance);
-    return getJourneyDistance;
-}
-exports.getJourneyDistance = getJourneyDistance;
 // A Journey represents multiple Routes strung together
 class Journey {
     constructor(routes = []) {
@@ -72,6 +34,50 @@ class Journey {
         return routeString;
     }
 }
+// routes is a directed graph data structure
+const routes = [
+    new Route('A', 'B', 5),
+    new Route('B', 'C', 4),
+    new Route('C', 'D', 8),
+    new Route('D', 'C', 8),
+    new Route('D', 'E', 6),
+    new Route('A', 'D', 5),
+    new Route('C', 'E', 2),
+    new Route('E', 'B', 3),
+    new Route('A', 'E', 7),
+];
+const errmsg = {
+    'no_route': 'NO SUCH ROUTE'
+};
+// Provide journey string, receive distance
+// @param journey - eg: 'A-B-C'
+function getJourneyDistance(journey) {
+    let journeyRoutes = [];
+    const towns = journey.split('-');
+    if (towns.length === 1)
+        return 0;
+    try {
+        towns.forEach((town, i) => {
+            if (i < towns.length - 1) {
+                const start = town;
+                const end = towns[i + 1];
+                const route = routes.find(r => {
+                    return r.start === start && r.end === end;
+                });
+                if (!route)
+                    throw new Error(errmsg.no_route);
+                journeyRoutes.push(route);
+            }
+        });
+    }
+    catch (e) {
+        return e.message;
+    }
+    let getJourneyDistance = 0;
+    journeyRoutes.forEach(r => getJourneyDistance += r.distance);
+    return getJourneyDistance;
+}
+exports.getJourneyDistance = getJourneyDistance;
 // Return number of possible Journeys between two towns
 //
 // @param start - Starting town/node
@@ -90,6 +96,20 @@ function getJourneysBetween(start, end, stops, exactStops = false) {
     return journeys.filter(j => end === j.lastRoute().end).length;
 }
 exports.getJourneysBetween = getJourneysBetween;
+// Return distance of shortest Journey between two towns
+//
+// @param start - Starting town/node
+// @param end - Final destination town/node
+function getShortestJourneyDistance(start, end) {
+    let journeys = getJourneys(start, routes.length, end); // routes.length is the longest possible Journey
+    // Early return if no Journeys
+    if (journeys.length === 0)
+        return errmsg.no_route;
+    let journeyDistances = journeys.map(j => getJourneyDistance(j.toString()));
+    return journeyDistances.sort((a, b) => a - b).shift()
+        || errmsg.no_route; // 'OR error' handles potential failure of .shift() (keeps TS happy)
+}
+exports.getShortestJourneyDistance = getShortestJourneyDistance;
 // Return all possible Journeys from a start point
 // (In effect this is a Breadth First Search algorithm)
 //
@@ -103,7 +123,6 @@ function getJourneys(start, stops, end) {
     while (stops > 1) {
         let q = [];
         journeys.forEach(j => {
-            // TODO: Modify to allow NOT ending at end, but continue until stops
             if (end && j.lastRoute().end === end) {
                 // End found so push it back as is (exploration over)
                 q.push(j);

@@ -31,6 +31,12 @@ describe('getJourneyDistance', function() {
             assert.equal(App.getJourneyDistance('A-E-D'), 'NO SUCH ROUTE');
         });
     });
+
+    describe('Well formatted, non-existant: Q-Q-Q', function() {
+        it('expects no route', function() {
+            assert.equal(App.getJourneyDistance('Q-Q-Q'), 'NO SUCH ROUTE');
+        });
+    });
 });
 
 describe('getJourneysBetween', function() {
@@ -49,6 +55,12 @@ describe('getJourneysBetween', function() {
     describe('C to D, 7 stops max', function() {
         it('expects 3', function() {
             assert.equal(App.getJourneysBetween('C', 'D', 7), 3);
+        });
+    });
+
+    describe('Q to Q, 7 stops max', function() {
+        it('expects no route', function() {
+            assert.equal(App.getJourneysBetween('Q', 'Q', 7), 'NO SUCH ROUTE');
         });
     });
 
@@ -78,9 +90,27 @@ describe('getShortestJourneyDistance', function() {
         });
     });
 
-    describe('C to C, 3 stops max', function() {
+    describe('B to B', function() {
         it('expects 9', function() {
             assert.equal(App.getShortestJourneyDistance('B', 'B'), 9);
+        });
+    });
+
+    describe('A to B', function() {
+        it('expects 5', function() {
+            assert.equal(App.getShortestJourneyDistance('A', 'B'), 5);
+        });
+    });
+
+    describe('E to C', function() {
+        it('expects 7', function() {
+            assert.equal(App.getShortestJourneyDistance('E', 'C'), 7);
+        });
+    });
+
+    describe('Q to Q', function() {
+        it('expects no route', function() {
+            assert.equal(App.getShortestJourneyDistance('Q', 'Q'), 'NO SUCH ROUTE');
         });
     });
 });

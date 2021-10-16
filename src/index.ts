@@ -55,9 +55,13 @@ const routes = [
     new Route('A', 'E', 7),
 ];
 
+const errmsg = {
+    'no_route': 'NO SUCH ROUTE'
+};
+
 // Provide journey string, receive distance
 // @param journey - eg: 'A-B-C'
-export function getJourneyDistance(journey: string): number|string|Error {
+export function getJourneyDistance(journey: string): number|string {
     let journeyRoutes: Array<Route> = [];
     const towns = journey.split('-');
 
@@ -73,7 +77,7 @@ export function getJourneyDistance(journey: string): number|string|Error {
                     return r.start === start && r.end === end;
                 });
 
-                if (!route) throw new Error('NO SUCH ROUTE');
+                if (!route) throw new Error(errmsg.no_route);
 
                 journeyRoutes.push(route);
             }
@@ -106,6 +110,24 @@ export function getJourneysBetween(start: string, end: string, stops: number, ex
     return journeys.filter(j => end === j.lastRoute().end).length;
 }
 
+// Return distance of shortest Journey between two towns
+//
+// @param start - Starting town/node
+// @param end - Final destination town/node
+export function getShortestJourneyDistance(start: string, end: string):number|string {
+    let journeys = getJourneys(start, routes.length, end); // routes.length is the longest possible Journey
+
+    // Early return if no Journeys
+    if (journeys.length === 0) return errmsg.no_route;
+
+    let journeyDistances = journeys.map(j =>
+        getJourneyDistance(j.toString())
+    );
+
+    return journeyDistances.sort((a: any, b: any) => a - b).shift()
+        || errmsg.no_route; // 'OR error' handles potential failure of .shift() (keeps TS happy)
+}
+
 // Return all possible Journeys from a start point
 // (In effect this is a Breadth First Search algorithm)
 //
@@ -121,7 +143,6 @@ function getJourneys(start: string, stops: number, end?: string): Array<Journey>
         let q: Array<Journey> = [];
 
         journeys.forEach(j => {
-            // TODO: Modify to allow NOT ending at end, but continue until stops
             if (end && j.lastRoute().end === end) {
                 // End found so push it back as is (exploration over)
                 q.push(j);
