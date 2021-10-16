@@ -93,7 +93,8 @@ function getJourneysBetween(start, end, stops, exactStops = false) {
     else {
         journeys = getJourneys(start, stops, end);
     }
-    return journeys.filter(j => end === j.lastRoute().end).length;
+    return journeys.filter(j => end === j.lastRoute().end).length
+        || errmsg.no_route; // Length 0 is falsy so falls through to error message
 }
 exports.getJourneysBetween = getJourneysBetween;
 // Return distance of shortest Journey between two towns

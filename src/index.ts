@@ -98,7 +98,7 @@ export function getJourneyDistance(journey: string): number|string {
 // @param stops - Maximum amount of stops allowed to reach end
 // @param exactStops(optional) - Optionally request only results with the exact number of stops
 //                               (overrides default 'stops' functionality)
-export function getJourneysBetween(start: string, end: string, stops: number, exactStops: Boolean = false): number {
+export function getJourneysBetween(start: string, end: string, stops: number, exactStops: Boolean = false): number|string {
     let journeys: Array<Journey>;
 
     if (exactStops) {
@@ -107,7 +107,8 @@ export function getJourneysBetween(start: string, end: string, stops: number, ex
         journeys = getJourneys(start, stops, end);
     }
 
-    return journeys.filter(j => end === j.lastRoute().end).length;
+    return journeys.filter(j => end === j.lastRoute().end).length
+        || errmsg.no_route; // Length 0 is falsy so falls through to error message
 }
 
 // Return distance of shortest Journey between two towns
@@ -155,8 +156,6 @@ function getJourneys(start: string, stops: number, end?: string): Array<Journey>
 
         stops--;
     }
-
-    // journeys.forEach(j => console.log(j.toString()));
 
     return journeys;
 }
