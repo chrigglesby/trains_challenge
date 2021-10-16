@@ -58,9 +58,21 @@ describe('getJourneysBetween', function() {
         });
     });
 
-    describe('Q to Q, 7 stops max', function() {
-        it('expects no route', function() {
-            assert.equal(App.getJourneysBetween('Q', 'Q', 7), 'NO SUCH ROUTE');
+    describe('Non-existent towns: Q to Q, 7 stops max', function() {
+        it('expects 0', function() {
+            assert.equal(App.getJourneysBetween('Q', 'Q', 7), 0);
+        });
+    });
+
+    describe('Valid towns, max stops insufficient: A to C, 1 stop max', function() {
+        it('expects 0', function() {
+            assert.equal(App.getJourneysBetween('A', 'C', 1), 0);
+        });
+    });
+
+    describe('C to C, -3 stops max', function() {
+        it('expects 0', function() {
+            assert.equal(App.getJourneysBetween('C', 'C', -3), 0);
         });
     });
 
@@ -79,6 +91,12 @@ describe('getJourneysBetween', function() {
     describe('C to D, 7 stops exact', function() {
         it('expects 4', function() {
             assert.equal(App.getJourneysBetween('C', 'D', 7, true), 4);
+        });
+    });
+
+    describe('C to D, -7 stops exact', function() {
+        it('expects 0', function() {
+            assert.equal(App.getJourneysBetween('C', 'D', -7, true), 0);
         });
     });
 });

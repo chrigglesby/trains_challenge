@@ -86,6 +86,8 @@ exports.getJourneyDistance = getJourneyDistance;
 // @param exactStops(optional) - Optionally request only results with the exact number of stops
 //                               (overrides default 'stops' functionality)
 function getJourneysBetween(start, end, stops, exactStops = false) {
+    if (stops < 1)
+        return 0;
     let journeys;
     if (exactStops) {
         journeys = getJourneys(start, stops);
@@ -93,8 +95,7 @@ function getJourneysBetween(start, end, stops, exactStops = false) {
     else {
         journeys = getJourneys(start, stops, end);
     }
-    return journeys.filter(j => end === j.lastRoute().end).length
-        || errmsg.no_route; // Length 0 is falsy so falls through to error message
+    return journeys.filter(j => end === j.lastRoute().end).length;
 }
 exports.getJourneysBetween = getJourneysBetween;
 // Return distance of shortest Journey between two towns
@@ -119,6 +120,8 @@ exports.getShortestJourneyDistance = getShortestJourneyDistance;
 //                (necessary as the data is a Cyclic Directed Graph and could search infinitely)
 // @param end (optional) - Optionally cap the search once a specified node is reached
 function getJourneys(start, stops, end) {
+    if (stops < 1)
+        return [];
     let journeys = getRoutes(start)
         .map(x => new Journey([x]));
     while (stops > 1) {
@@ -135,7 +138,6 @@ function getJourneys(start, stops, end) {
         journeys = q;
         stops--;
     }
-    // journeys.forEach(j => console.log(j.toString()));
     return journeys;
 }
 // Get Routes by start node
