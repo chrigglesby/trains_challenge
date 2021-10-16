@@ -115,7 +115,7 @@ function getJourneys(start, stops, end) {
         journeys = q;
         stops--;
     }
-    journeys.forEach(j => console.log(j.toString()));
+    // journeys.forEach(j => console.log(j.toString()));
     return journeys;
 }
 // Get Routes by start node

@@ -70,3 +70,17 @@ describe('getJourneysBetween', function() {
         });
     });
 });
+
+describe('getShortestJourneyDistance', function() {
+    describe('A to C', function() {
+        it('expects 9', function() {
+            assert.equal(App.getShortestJourneyDistance('A', 'C'), 9);
+        });
+    });
+
+    describe('C to C, 3 stops max', function() {
+        it('expects 9', function() {
+            assert.equal(App.getShortestJourneyDistance('B', 'B'), 9);
+        });
+    });
+});

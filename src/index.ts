@@ -1,3 +1,5 @@
+// A Route represents the link between two stations/towns
+// - It is also an 'edge' in terms of a directed graph data structure
 class Route {
     start: string;
     end: string;
@@ -10,6 +12,37 @@ class Route {
     }
 }
 
+// A Journey represents multiple Routes strung together
+class Journey {
+    routes: Array<Route>;
+
+    constructor(routes: Array<Route> = []) {
+        this.routes = routes;
+    }
+
+    lastRoute():Route {
+        if (this.routes.length === 0) throw new Error('Journey has no Routes');
+
+        return this.routes[this.routes.length - 1];
+    }
+
+    toString():string {
+        let routeString = '';
+
+        this.routes.forEach((r, i) => {
+            const last = i === this.routes.length - 1;
+
+            if (last) {
+                routeString += r.start + '-' + r.end;
+            } else {
+                routeString += r.start + '-';
+            }
+        });
+        return routeString;
+    }
+}
+
+// routes is a directed graph data structure
 const routes = [
     new Route('A', 'B', 5),
     new Route('B', 'C', 4),
@@ -52,36 +85,6 @@ export function getJourneyDistance(journey: string): number|string|Error {
     let getJourneyDistance = 0;
     journeyRoutes.forEach(r => getJourneyDistance += r.distance);
     return getJourneyDistance;
-}
-
-// A Journey represents multiple Routes strung together
-class Journey {
-    routes: Array<Route>;
-
-    constructor(routes: Array<Route> = []) {
-        this.routes = routes;
-    }
-
-    lastRoute():Route {
-        if (this.routes.length === 0) throw new Error('Journey has no Routes');
-
-        return this.routes[this.routes.length - 1];
-    }
-
-    toString():string {
-        let routeString = '';
-
-        this.routes.forEach((r, i) => {
-            const last = i === this.routes.length - 1;
-
-            if (last) {
-                routeString += r.start + '-' + r.end;
-            } else {
-                routeString += r.start + '-';
-            }
-        });
-        return routeString;
-    }
 }
 
 // Return number of possible Journeys between two towns
