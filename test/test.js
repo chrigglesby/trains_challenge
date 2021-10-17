@@ -132,3 +132,47 @@ describe('getShortestJourneyDistance', function() {
         });
     });
 });
+
+describe('getJourneysByDistance', function() {
+    describe('C to C, distance 27', function() {
+        it('expects 7', function() {
+            assert.equal(App.getJourneysByDistance('C', 27, 'C'), 7);
+        });
+    });
+
+    describe('E to E, distance 10', function() {
+        it('expects 1', function() {
+            assert.equal(App.getJourneysByDistance('E', 10, 'E'), 1);
+        });
+    });
+
+    describe('E to E, distance 30', function() {
+        it('expects 4', function() {
+            assert.equal(App.getJourneysByDistance('E', 30, 'E'), 4);
+        });
+    });
+
+    describe('A to C, distance 12', function() {
+        it('expects 1', function() {
+            assert.equal(App.getJourneysByDistance('A', 12, 'C'), 1);
+        });
+    });
+
+    describe('A to C, distance 21', function() {
+        it('expects 5', function() {
+            assert.equal(App.getJourneysByDistance('A', 21, 'C'), 5);
+        });
+    });
+
+    describe('A to C, distance 0', function() {
+        it('expects 0', function() {
+            assert.equal(App.getJourneysByDistance('A', 0, 'C'), 0);
+        });
+    });
+
+    describe('Q to Q, distance 12', function() {
+        it('expects 0', function() {
+            assert.equal(App.getJourneysByDistance('Q', 12, 'Q'), 0);
+        });
+    });
+});

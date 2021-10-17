@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getShortestJourneyDistance = exports.getJourneysBetween = exports.getJourneyDistance = void 0;
+exports.getJourneysByDistance = exports.getShortestJourneyDistance = exports.getJourneysBetween = exports.getJourneyDistance = void 0;
 // A Route represents the link between two stations/towns
 // - It is also an 'edge' in terms of a directed graph data structure
 class Route {
@@ -140,6 +140,53 @@ function getJourneys(start, stops, end) {
     }
     return journeys;
 }
+// Return number of possible Journeys between two towns within a specified distance
+//
+// @param start - Starting town/node
+// @param distance - Max total distance of combined Routes
+// @param end - Final destination town/node
+function getJourneysByDistance(start, distance, end) {
+    if (distance < 1)
+        return 0;
+    let journeys = getRoutes(start)
+        .map(x => new Journey([x]));
+    let d = distance;
+    while (d > 0) {
+        let q = [];
+        journeys.forEach(j => {
+            let next = getNextJourneyOptions(j);
+            next = next.filter(n => getJourneyDistance(n.toString()) <= distance);
+            if (next.length > 0) {
+                q.push(...next);
+            }
+            else {
+                q.push(j);
+            }
+        });
+        // Latest explored Route distances
+        let routeDistances = q.map(j => j.lastRoute().distance);
+        routeDistances.sort((a, b) => a - b);
+        if (routeDistances.length > 0) {
+            d -= routeDistances[0];
+        }
+        else {
+            d = 0; // End loop
+        }
+        journeys = q;
+    }
+    let journeyStrings = journeys.map(j => {
+        let towns = j.toString().split('-');
+        towns.shift(); // Exclude start town
+        let endIndex = towns.lastIndexOf(end);
+        if (endIndex === -1)
+            return false; // Mapped to false if end not found
+        return towns.slice(0, endIndex + 1).join('');
+    }).filter(j => j);
+    // console.log(journeyStrings);
+    // journeys.forEach(j => console.log(j.toString()));
+    return new Set(journeyStrings).size; // Set.size ensures only uniques are counted
+}
+exports.getJourneysByDistance = getJourneysByDistance;
 // Get Routes by start node
 //
 // @param start - Start node

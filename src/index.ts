@@ -163,6 +163,63 @@ function getJourneys(start: string, stops: number, end?: string): Array<Journey>
     return journeys;
 }
 
+// Return number of possible Journeys between two towns within a specified distance
+//
+// @param start - Starting town/node
+// @param distance - Max total distance of combined Routes
+// @param end - Final destination town/node
+export function getJourneysByDistance(start: string, distance: number, end: string): number {
+    if (distance < 1) return 0;
+
+    let journeys: Array<Journey> = getRoutes(start)
+        .map(x => new Journey([x]));
+
+    let d = distance;
+
+    while(d > 0) {
+        let q: Array<Journey> = [];
+
+        journeys.forEach(j => {
+            let next = getNextJourneyOptions(j);
+
+            next = next.filter(n => getJourneyDistance(n.toString()) <= distance);
+
+            if (next.length > 0) {
+                q.push(...next);
+            } else {
+                q.push(j);
+            }
+        });
+
+        // Latest explored Route distances
+        let routeDistances = q.map(j => j.lastRoute().distance);
+        routeDistances.sort((a, b) => a - b);
+
+        if (routeDistances.length > 0) {
+            d -= routeDistances[0];
+        } else {
+            d = 0; // End loop
+        }
+
+        journeys = q;
+    }
+
+    let journeyStrings = journeys.map(j => {
+        let towns = j.toString().split('-');
+        towns.shift(); // Exclude start town
+
+        let endIndex = towns.lastIndexOf(end);
+        if (endIndex === -1) return false; // Mapped to false if end not found
+
+        return towns.slice(0, endIndex + 1).join('');
+    }).filter(j => j);
+
+    // console.log(journeyStrings);
+    // journeys.forEach(j => console.log(j.toString()));
+
+    return new Set(journeyStrings).size; // Set.size ensures only uniques are counted
+}
+
 // Get Routes by start node
 //
 // @param start - Start node
