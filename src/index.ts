@@ -214,9 +214,6 @@ export function getJourneysByDistance(start: string, distance: number, end: stri
         return towns.slice(0, endIndex + 1).join('');
     }).filter(j => j);
 
-    // console.log(journeyStrings);
-    // journeys.forEach(j => console.log(j.toString()));
-
     return new Set(journeyStrings).size; // Set.size ensures only uniques are counted
 }
 
