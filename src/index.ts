@@ -130,39 +130,6 @@ export function getShortestJourneyDistance(start: string, end: string):number|st
         || errmsg.no_route; // 'OR error' handles potential failure of .shift() (keeps TS happy)
 }
 
-// Return all possible Journeys from a start point
-// (In effect this is a Breadth First Search algorithm)
-//
-// @param start - Node to begin search from
-// @param stops - Depth/Iterations to which we limit the search
-//                (necessary as the data is a Cyclic Directed Graph and could search infinitely)
-// @param end (optional) - Optionally cap the search once a specified node is reached
-function getJourneys(start: string, stops: number, end?: string): Array<Journey> {
-    if (stops < 1) return [];
-
-    let journeys: Array<Journey> = getRoutes(start)
-        .map(x => new Journey([x]));
-
-    while(stops > 1) {
-        let q: Array<Journey> = [];
-
-        journeys.forEach(j => {
-            if (end && j.lastRoute().end === end) {
-                // End found so push it back as is (exploration over)
-                q.push(j);
-            } else {
-                q.push(...getNextJourneyOptions(j));
-            }
-        });
-
-        journeys = q;
-
-        stops--;
-    }
-
-    return journeys;
-}
-
 // Return number of possible Journeys between two towns within a specified distance
 //
 // @param start - Starting town/node
@@ -215,6 +182,39 @@ export function getJourneysByDistance(start: string, distance: number, end: stri
     }).filter(j => j);
 
     return new Set(journeyStrings).size; // Set.size ensures only uniques are counted
+}
+
+// Return all possible Journeys from a start point
+// (In effect this is a Breadth First Search algorithm)
+//
+// @param start - Node to begin search from
+// @param stops - Depth/Iterations to which we limit the search
+//                (necessary as the data is a Cyclic Directed Graph and could search infinitely)
+// @param end (optional) - Optionally cap the search once a specified node is reached
+function getJourneys(start: string, stops: number, end?: string): Array<Journey> {
+    if (stops < 1) return [];
+
+    let journeys: Array<Journey> = getRoutes(start)
+        .map(x => new Journey([x]));
+
+    while(stops > 1) {
+        let q: Array<Journey> = [];
+
+        journeys.forEach(j => {
+            if (end && j.lastRoute().end === end) {
+                // End found so push it back as is (exploration over)
+                q.push(j);
+            } else {
+                q.push(...getNextJourneyOptions(j));
+            }
+        });
+
+        journeys = q;
+
+        stops--;
+    }
+
+    return journeys;
 }
 
 // Get Routes by start node
