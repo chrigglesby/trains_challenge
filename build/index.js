@@ -112,34 +112,6 @@ function getShortestJourneyDistance(start, end) {
         || errmsg.no_route; // 'OR error' handles potential failure of .shift() (keeps TS happy)
 }
 exports.getShortestJourneyDistance = getShortestJourneyDistance;
-// Return all possible Journeys from a start point
-// (In effect this is a Breadth First Search algorithm)
-//
-// @param start - Node to begin search from
-// @param stops - Depth/Iterations to which we limit the search
-//                (necessary as the data is a Cyclic Directed Graph and could search infinitely)
-// @param end (optional) - Optionally cap the search once a specified node is reached
-function getJourneys(start, stops, end) {
-    if (stops < 1)
-        return [];
-    let journeys = getRoutes(start)
-        .map(x => new Journey([x]));
-    while (stops > 1) {
-        let q = [];
-        journeys.forEach(j => {
-            if (end && j.lastRoute().end === end) {
-                // End found so push it back as is (exploration over)
-                q.push(j);
-            }
-            else {
-                q.push(...getNextJourneyOptions(j));
-            }
-        });
-        journeys = q;
-        stops--;
-    }
-    return journeys;
-}
 // Return number of possible Journeys between two towns within a specified distance
 //
 // @param start - Starting town/node
@@ -182,11 +154,37 @@ function getJourneysByDistance(start, distance, end) {
             return false; // Mapped to false if end not found
         return towns.slice(0, endIndex + 1).join('');
     }).filter(j => j);
-    // console.log(journeyStrings);
-    // journeys.forEach(j => console.log(j.toString()));
     return new Set(journeyStrings).size; // Set.size ensures only uniques are counted
 }
 exports.getJourneysByDistance = getJourneysByDistance;
+// Return all possible Journeys from a start point
+// (In effect this is a Breadth First Search algorithm)
+//
+// @param start - Node to begin search from
+// @param stops - Depth/Iterations to which we limit the search
+//                (necessary as the data is a Cyclic Directed Graph and could search infinitely)
+// @param end (optional) - Optionally cap the search once a specified node is reached
+function getJourneys(start, stops, end) {
+    if (stops < 1)
+        return [];
+    let journeys = getRoutes(start)
+        .map(x => new Journey([x]));
+    while (stops > 1) {
+        let q = [];
+        journeys.forEach(j => {
+            if (end && j.lastRoute().end === end) {
+                // End found so push it back as is (exploration over)
+                q.push(j);
+            }
+            else {
+                q.push(...getNextJourneyOptions(j));
+            }
+        });
+        journeys = q;
+        stops--;
+    }
+    return journeys;
+}
 // Get Routes by start node
 //
 // @param start - Start node
